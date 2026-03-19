@@ -30,11 +30,12 @@ client.on("message", async (channel, tags, message, self) => {
       .from("community_tasks")
       .insert({ username, task });
 
-    if (error) {
-      client.say(channel, `@${username} something went wrong adding your task!`);
-    } else {
-      client.say(channel, `@${username} task added: "${task}" 🐦`);
-    }
+      if (error) {
+        console.error("Supabase insert error:", JSON.stringify(error));
+        client.say(channel, `@${username} something went wrong adding your task!`);
+      } else {
+        client.say(channel, `@${username} task added: "${task}" 🐦`);
+      }
   }
 
   // ── !tasks ────────────────────────────────────────────────────────────────
