@@ -234,6 +234,8 @@ else if (msg.toLowerCase().startsWith("!remove ")) {
   if (error) {
     client.say(channel, `Something went wrong removing the task!`);
   } else {
-    client.say(chan
-
+    client.say(channel, `@${username} removed "${taskToRemove.task}" from ${targetUser}'s list!`);
+  }
+}
+  
 });
