@@ -188,4 +188,52 @@ client.on("message", async (channel, tags, message, self) => {
       client.say(channel, "Completed tasks cleared! 🐦");
     }
   }
+// ── !remove [username] [number] (mods/broadcaster only) ──────────────────
+else if (msg.toLowerCase().startsWith("!remove ")) {
+  const isMod = tags.mod;
+  const isBroadcaster = tags.username === process.env.TWITCH_CHANNEL.toLowerCase();
+
+  if (!isMod && !isBroadcaster) {
+    client.say(channel, `@${username} only mods can remove tasks!`);
+    return;
+  }
+
+  const args = msg.slice(8).trim().split(" ");
+  const targetUser = args[0].toLowerCase().replace("@", "");
+  const taskNum = parseInt(args[1]);
+
+  if (!targetUser || isNaN(taskNum)) {
+    client.say(channel, `@${username} usage: !remove [username] [task number]`);
+    return;
+  }
+
+  const { data: userTasks } = await supabase
+    .from("community_tasks")
+    .select("*")
+    .eq("username", targetUser)
+    .eq("done", false)
+    .order("created_at", { ascending: true });
+
+  if (!userTasks || userTasks.length === 0) {
+    client.say(channel, `@${username} no active tasks found for ${targetUser}!`);
+    return;
+  }
+
+  if (taskNum < 1 || taskNum > userTasks.length) {
+    client.say(channel, `@${username} invalid task number! ${targetUser} has ${userTasks.length} active task(s).`);
+    return;
+  }
+
+  const taskToRemove = userTasks[taskNum - 1];
+
+  const { error } = await supabase
+    .from("community_tasks")
+    .delete()
+    .eq("id", taskToRemove.id);
+
+  if (error) {
+    client.say(channel, `Something went wrong removing the task!`);
+  } else {
+    client.say(chan
+
 });
